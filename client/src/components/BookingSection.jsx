@@ -103,8 +103,8 @@ const BookingSection = () => {
               <button type="submit" className="book-btn">BOOK NOW</button>
             </form>
             {message && (
-              <p style={{ 
-                marginTop: "20px", 
+              <p style={{
+                marginTop: "20px",
                 color: message.toLowerCase().includes("error") ? "red" : "green",
                 fontWeight: "600"
               }}>
@@ -118,13 +118,13 @@ const BookingSection = () => {
               title="location-map"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3667.5014182350574!2d72.61504507477505!3d23.188390410120924!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395c2b583b26a227%3A0x6e6223ac07ea4401!2sLa%20Crest%20Restaurant%20%26%20Banquet!5e0!3m2!1sen!2sin!4v1774865991229!5m2!1sen!2sin"
               height="100%"
-              
+              width="100%"
               style={{ border: 0, borderRadius: '15px' }}
               allowFullScreen=""
               loading="lazy"
             ></iframe>
           </div>
-        </div>
+        </div>  
       </div>
     </section>
   );

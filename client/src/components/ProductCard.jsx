@@ -1,15 +1,30 @@
+import React, { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import "./product.css";
 
 const ProductCard = ({ product }) => {
+  const { user } = useContext(AuthContext);
+  const API_URL = "http://localhost:5000";
+
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "https://via.placeholder.com/150";
+    if (imagePath.startsWith("http")) return imagePath;
+    return `${API_URL}/${imagePath}`;
+  };
 
   const addToCart = async () => {
-    await fetch("/api/cart/add", {
+    if (!user) {
+      alert("Please login to add to cart");
+      return;
+    }
+
+    await fetch(`${API_URL}/api/cart/add`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId: "123",
+        userId: user._id,
         product: {
           productId: product._id,
           name: product.name,
@@ -24,7 +39,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="food-card">
-      <img src={product.image} alt="" className="food-img" />
+      <img src={getImageUrl(product.image)} alt="" className="food-img" />
 
       <div className="food-content">
         <h3>{product.name}</h3>

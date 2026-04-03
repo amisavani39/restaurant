@@ -97,14 +97,125 @@ ul {
   margin-left: 20px;
 }
 
-.user_option a {
+.user_option a, .user_option button {
+  background: none;
+  border: none;
   color: var(--text-white);
   margin: 0 10px;
   font-size: 18px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
 }
 
-.user_option a:hover {
+.user_option a:hover, .user_option button:hover {
   color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+/* User Sidebar */
+.user_sidebar {
+  position: fixed;
+  top: 0;
+  right: -350px;
+  width: 350px;
+  height: 100vh;
+  background: var(--secondary-color);
+  z-index: 2000;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  transition: all 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.user_sidebar.open {
+  right: 0;
+}
+
+.sidebar_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 20px;
+}
+
+.sidebar_header h3 {
+  color: var(--primary-color);
+  font-size: 28px;
+}
+
+.close_btn {
+  background: none;
+  border: none;
+  color: var(--text-white);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.sidebar_content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar_content p {
+  color: var(--text-grey);
+  margin-bottom: 20px;
+}
+
+.sidebar_link {
+  padding: 15px 25px;
+  border-radius: 30px;
+  text-align: center;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.sidebar_link.primary {
+  background: var(--primary-color);
+  color: var(--text-white);
+}
+
+.sidebar_link.secondary {
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.sidebar_link:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.logout_btn {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.sidebar_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  z-index: 1500;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .order_online {
@@ -545,6 +656,12 @@ ul {
   overflow: hidden;
 }
 
+@media (max-width: 576px) {
+  .map-container {
+    height: 300px;
+  }
+}
+
 /* Testimonial Section */
 .testimonial-section {
   padding: var(--section-padding);
@@ -918,15 +1035,202 @@ ul {
   }
 }
 
+/* Auth Page */
+.auth_section {
+  background: var(--bg-light);
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+.auth_container {
+  background: #fff;
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 900px;
+  min-height: 550px;
+  margin: 0 auto;
+  display: flex;
+}
+
+.form_container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transition: all 0.6s ease-in-out;
+  padding: 50px;
+  width: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login_form {
+  left: 0;
+  z-index: 2;
+}
+
+.register_form {
+  left: 0;
+  opacity: 0;
+  z-index: 1;
+}
+
+.auth_container .auth_slider.active ~ .login_form {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.auth_container .auth_slider.active ~ .register_form {
+  transform: translateX(100%);
+  opacity: 1;
+  z-index: 5;
+  animation: show 0.6s;
+}
+
+@keyframes show {
+  0%, 49.99% { opacity: 0; z-index: 1; }
+  50%, 100% { opacity: 1; z-index: 5; }
+}
+
+.auth_slider {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.6s ease-in-out;
+  z-index: 100;
+  background: var(--secondary-color);
+  background: linear-gradient(to right, var(--secondary-color), #343a40);
+  color: #fff;
+}
+
+.auth_slider.active {
+  transform: translateX(-100%);
+}
+
+.slider_content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 40px;
+}
+
+.slider_content h2 {
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 20px;
+}
+
+.ghost_btn {
+  background-color: transparent;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 12px 45px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: transform 80ms ease-in;
+  cursor: pointer;
+  border-radius: 30px;
+  margin-top: 20px;
+}
+
+.ghost_btn:hover {
+  background: #fff;
+  color: var(--secondary-color);
+}
+
+.form_container form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.form_container h2 {
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 30px;
+  color: var(--text-dark);
+}
+
+.input_group {
+  width: 100%;
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.input_group .icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.input_group input {
+  width: 100%;
+  padding: 15px 15px 15px 45px;
+  background: #eee;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+}
+
+.auth_btn {
+  border-radius: 30px;
+  border: 1px solid var(--primary-color);
+  background-color: var(--primary-color);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 12px 45px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: transform 80ms ease-in;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.auth_btn:hover {
+  background: var(--primary-hover);
+}
+
+.error_msg {
+  color: #ff4d4d;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
 @media (max-width: 768px) {
-  .offers-wrapper {
-    grid-template-columns: 1fr;
+  .auth_container {
+    flex-direction: column;
+    max-width: 400px;
   }
-  .about-container {
-    flex-direction: column-reverse;
+  .form_container, .auth_slider {
+    width: 100%;
+    position: relative;
+    left: 0;
+    transform: none;
   }
-  .testimonial-card {
-    max-width: 100%;
+  .auth_slider {
+    order: -1;
+    min-height: 200px;
+  }
+  .auth_slider.active {
+    transform: none;
+  }
+  .auth_container .auth_slider.active ~ .login_form,
+  .auth_container .auth_slider.active ~ .register_form {
+    transform: none;
   }
 }
 

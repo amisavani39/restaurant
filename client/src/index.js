@@ -13,9 +13,18 @@ import MenuPage from './components/MenuPage';
 import BookTable from './components/BookTable';
 import About from './components/About';
 import ScrollToTop from './components/ScrollToTop';
-import Login from './components/Login';
-import Register from './components/Register';
+import Auth from './components/Auth';
+import CartPage from './components/CartPage';
+import OrderSuccess from './components/OrderSuccess';
+import MyOrders from './components/MyOrders';
 import { AuthProvider } from './context/AuthContext';
+
+// Admin Components
+import AdminLayout from './admin/AdminLayout';
+import AdminDashboard from './admin/AdminDashboard';
+import FoodManagement from './admin/FoodManagement';
+import BookingList from './admin/BookingList';
+import OrderManagement from './admin/OrderManagement';
 
 const App = () => {
   useEffect(() => {
@@ -36,8 +45,20 @@ const App = () => {
               <Route path="/menu" element={<MenuPage />} />
               <Route path="/book" element={<BookTable />} />
               <Route path="/about" element={<About />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Auth />} />
+              <Route path="/register" element={<Auth />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/orders" element={<MyOrders />} />
+
+              <Route path="/order-success" element={<OrderSuccess />} />
+
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="food" element={<FoodManagement />} />
+                <Route path="bookings" element={<BookingList />} />
+                <Route path="orders" element={<OrderManagement />} />
+              </Route>
             </Routes>
           </Router>
       </AuthProvider>
