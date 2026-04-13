@@ -12,7 +12,7 @@ const FoodManagement = () => {
     category: 'Burger',
     image: ''
   });
-  const API_URL = "http://localhost:5000";
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     fetchFoods();
@@ -124,11 +124,11 @@ const FoodManagement = () => {
             {foods.map((food) => (
               <tr key={food._id}>
                 <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>
-                  <img src={food.image?.startsWith('http') ? food.image : `${API_URL}/${food.image}`} alt={food.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '5px' }} />
+                  <img src={food.image?.startsWith('http') || food.image?.startsWith('/') ? food.image : (food.image?.startsWith('image/') ? `/${food.image}` : `${API_URL}/${food.image}`)} alt={food.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '5px' }} />
                 </td>
                 <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{food.name}</td>
                 <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>{food.category}</td>
-                <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>${food.price}</td>
+                <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>₹{food.price}</td>
                 <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>
                   <button style={{ marginRight: '10px', padding: '5px 10px', cursor: 'pointer' }}>Edit</button>
                   <button onClick={() => deleteFood(food._id)} style={{ color: 'red', padding: '5px 10px', cursor: 'pointer' }}>Delete</button>

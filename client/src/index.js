@@ -25,6 +25,7 @@ import AdminDashboard from './admin/AdminDashboard';
 import FoodManagement from './admin/FoodManagement';
 import BookingList from './admin/BookingList';
 import OrderManagement from './admin/OrderManagement';
+import { CartProvider } from './context/CartContext';
 
 const App = () => {
   useEffect(() => {
@@ -38,6 +39,7 @@ const App = () => {
   return (
     <React.StrictMode>
       <AuthProvider>
+        <CartProvider>
           <Router>
             <ScrollToTop />
             <Routes>
@@ -61,6 +63,7 @@ const App = () => {
               </Route>
             </Routes>
           </Router>
+        </CartProvider>
       </AuthProvider>
     </React.StrictMode>
   );

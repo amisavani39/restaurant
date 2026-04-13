@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { CartContext } from '../context/CartContext';
 import '../App.css'; 
 
 const Menu = () => {
@@ -8,8 +9,9 @@ const Menu = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
+  const { addToCart } = useContext(CartContext);
 
-  const API_URL = "http://localhost:5000";
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     fetchFoods();
@@ -26,41 +28,14 @@ const Menu = () => {
     }
   };
 
-  const addToCart = async (item) => {
-    if (!user) {
-      alert("Please login to add to cart");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/api/cart/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user._id,
-          product: {
-            productId: item._id,
-            name: item.name,
-            price: item.price,
-            image: item.image,
-          },
-        }),
-      });
-
-      if (response.ok) {
-        alert("Added to cart ✅");
-      } else {
-        alert("Failed to add to cart");
-      }
-    } catch (err) {
-      console.error("Error adding to cart:", err);
-      alert("Error adding to cart");
+  const handleAddToCart = async (item) => {
+    const success = await addToCart(item);
+    if (success) {
+      alert("Added to cart ✅");
     }
   };
 
-  const filters = ['All', 'Burger', 'Pizza', 'Pasta', 'Fries'];
+  const filters = ['All', ...new Set(menuItems.map(item => item.category))];
 
   const filteredItems = activeFilter === 'All'
     ? menuItems
@@ -68,7 +43,8 @@ const Menu = () => {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "https://via.placeholder.com/150";
-    if (imagePath.startsWith("http")) return imagePath;
+    if (imagePath.startsWith("http") || imagePath.startsWith("/")) return imagePath;
+    if (imagePath.startsWith("image/")) return `/${imagePath}`;
     return `${API_URL}/${imagePath}`;
   };
 
@@ -109,8 +85,8 @@ const Menu = () => {
                 <h3>{item.name || item.title}</h3>
                 <p>{item.description}</p>
                 <div className="card-footer">
-                  <span className="price">${item.price}</span>
-                  <button className="cart-btn" title="Add to Cart" onClick={() => addToCart(item)}>
+                  <span className="price">₹{item.price}</span>
+                  <button className="cart-btn" title="Add to Cart" onClick={() => handleAddToCart(item)}>
                     <i className="fa fa-shopping-cart"></i>
                   </button>
                 </div>

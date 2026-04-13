@@ -16,7 +16,7 @@ const Menu = () => {
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState(null);
 
-  const API_URL = "http://localhost:5000";
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     fetchFoods();
@@ -24,8 +24,11 @@ const Menu = () => {
 
   const fetchFoods = async () => {
     setLoading(true);
+    const token = localStorage.getItem("adminToken");
     try {
-      const res = await axios.get(`${API_URL}/api/food`);
+      const res = await axios.get(`${API_URL}/api/food`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setFoods(res.data);
       setLoading(false);
     } catch (error) {
@@ -44,6 +47,7 @@ const Menu = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("adminToken");
     const data = new FormData();
     data.append("name", formData.name);
     data.append("price", formData.price);
@@ -56,11 +60,17 @@ const Menu = () => {
     try {
       if (editMode) {
         await axios.put(`${API_URL}/api/food/${currentId}`, data, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { 
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`
+          },
         });
       } else {
         await axios.post(`${API_URL}/api/food`, data, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { 
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`
+          },
         });
       }
       setShowModal(false);
@@ -85,8 +95,11 @@ const Menu = () => {
 
   const deleteFood = async (id) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
+      const token = localStorage.getItem("adminToken");
       try {
-        await axios.delete(`${API_URL}/api/food/${id}`);
+        await axios.delete(`${API_URL}/api/food/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         fetchFoods();
       } catch (error) {
         console.error("Error deleting food", error);
@@ -108,7 +121,8 @@ const Menu = () => {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "https://via.placeholder.com/150";
-    if (imagePath.startsWith("http")) return imagePath;
+    if (imagePath.startsWith("http") || imagePath.startsWith("/")) return imagePath;
+    if (imagePath.startsWith("image/")) return `/${imagePath}`;
     return `${API_URL}/${imagePath}`;
   };
 
@@ -195,7 +209,7 @@ const Menu = () => {
                   <h3>{food.name}</h3>
                   <p className="description">{food.description}</p>
                   <div className="card-footer">
-                    <span className="price">${food.price}</span>
+                    <span className="price">₹{food.price}</span>
                     <div className="actions">
                       <button className="btn-edit" onClick={() => startEdit(food)} title="Edit">
                         <FaEdit />

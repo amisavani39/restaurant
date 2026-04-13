@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaBox, FaCalendarCheck, FaTachometerAlt, FaTimes, FaUtensils, FaSignOutAlt } from "react-icons/fa";
+import { FaBox, FaCalendarCheck, FaTachometerAlt, FaTimes, FaUtensils } from "react-icons/fa";
 import "./Sidebar.css";
 
 const Sidebar = ({ isOpen, onClose }) => {

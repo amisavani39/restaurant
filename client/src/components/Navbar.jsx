@@ -1,11 +1,13 @@
 import React, { useContext, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { CartContext } from "../context/CartContext";
 import { FaUser, FaShoppingCart, FaSearch, FaTimes, FaBars } from "react-icons/fa";
 
 const Navbar = () => {
   const location = useLocation();
   const { user, logout } = useContext(AuthContext);
+  const { cartCount } = useContext(CartContext);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -38,8 +40,9 @@ const Navbar = () => {
               <button onClick={toggleSidebar} className="user_link">
                 <FaUser />
               </button>
-              <Link to="/cart">
+              <Link to="/cart" className="cart_link">
                 <FaShoppingCart />
+                {cartCount > 0 && <span className="cart_count">{cartCount}</span>}
               </Link>
               <button className="search_btn">
                 <FaSearch />

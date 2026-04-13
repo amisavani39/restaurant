@@ -6,8 +6,8 @@ const path = require("path");
 // @route   POST /api/food
 exports.addFood = async (req, res) => {
   try {
-    const { name, price, description, category } = req.body;
-    let image = "";
+    const { name, price, description, category, image: bodyImage } = req.body;
+    let image = bodyImage || "";
     
     if (req.file) {
       image = `uploads/${req.file.filename}`;
@@ -26,14 +26,14 @@ exports.addFood = async (req, res) => {
 // @route   PUT /api/food/:id
 exports.updateFood = async (req, res) => {
   try {
-    const { name, price, description, category } = req.body;
+    const { name, price, description, category, image: bodyImage } = req.body;
     const food = await Food.findById(req.params.id);
 
     if (!food) {
       return res.status(404).json({ error: "Food not found" });
     }
 
-    let image = food.image;
+    let image = bodyImage || food.image;
     if (req.file) {
       // Delete old image if it exists
       if (food.image && fs.existsSync(path.join(__dirname, "..", food.image))) {

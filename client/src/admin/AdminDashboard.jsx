@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({ food: 0, bookings: 0, orders: 0 });
-  const API_URL = "http://localhost:5000";
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchStats = async () => {

@@ -10,6 +10,7 @@ const {
 
 router.post("/", createOrder);
 router.get("/", getAllOrders);
+router.get("/user/:userId", getOrdersByUserId);
 router.get("/:userId", getOrdersByUserId);
 router.put("/:id", updateOrderStatus);
 router.delete("/:id", deleteOrder);

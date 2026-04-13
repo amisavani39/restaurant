@@ -1,33 +1,72 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { CartContext } from "../context/CartContext";
+import { useNavigate, Link } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import { FaPlus, FaMinus, FaTrashAlt, FaShoppingCart } from "react-icons/fa";
+import "./CartPage.css";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const CartPage = () => {
-  const [cart, setCart] = useState([]);
+  const { cartItems, clearCart, removeFromCart, updateQuantity } = useContext(CartContext);
   const [address, setAddress] = useState("");
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const API_URL = "http://localhost:5000";
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
+  useEffect(() => {
+    AOS.init({ duration: 1000 });
+  }, []);
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "https://via.placeholder.com/150";
-    if (imagePath.startsWith("http")) return imagePath;
+    if (imagePath.startsWith("http") || imagePath.startsWith("/")) return imagePath;
+    if (imagePath.startsWith("image/")) return `/${imagePath}`;
     return `${API_URL}/${imagePath}`;
   };
 
-  useEffect(() => {
-    if (user) {
-      fetch(`${API_URL}/api/cart/${user._id}`)
-        .then((res) => res.json())
-        .then((data) => setCart(data?.items || []))
-        .catch((err) => console.error("Error fetching cart:", err));
+  const [updatingId, setUpdatingId] = useState(null);
+
+  const handleUpdateQuantity = async (item, change) => {
+    // Get a reliable ID from the item
+    const productId = item.productId?._id || item.productId || item._id;
+    if (!productId) return;
+
+    const currentQty = Number(item.quantity || 0);
+    const newQuantity = currentQty + change;
+    if (newQuantity < 1) return;
+    
+    setUpdatingId(productId);
+    try {
+      await updateQuantity(productId, newQuantity);
+    } finally {
+      setUpdatingId(null);
     }
-  }, [user]);
+  };
+
+  const handleRemoveFromCart = async (item) => {
+    // Determine the most reliable ID for this item
+    // Prefer product ID as the backend usually identifies items by product in a user's cart
+    const targetId = item.productId?._id || item.productId || item._id;
+    
+    if (!targetId) return;
+
+    if (window.confirm("Remove this item from cart?")) {
+      setUpdatingId(targetId);
+      try {
+        await removeFromCart(targetId);
+      } catch (err) {
+        console.error("Remove from cart failed:", err);
+      } finally {
+        setUpdatingId(null);
+      }
+    }
+  };
 
   const calculateTotal = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cartItems.reduce((total, item) => total + (Number(item.price || 0) * Number(item.quantity || 0)), 0);
   };
 
   const handlePlaceOrder = async () => {
@@ -43,8 +82,8 @@ const CartPage = () => {
 
     const orderData = {
       userId: user._id,
-      items: cart.map(item => ({
-        productId: item.productId,
+      items: cartItems.map(item => ({
+        productId: item.productId?._id || item.productId || item._id,
         name: item.name,
         price: item.price,
         quantity: item.quantity,
@@ -64,9 +103,10 @@ const CartPage = () => {
       });
 
       if (response.ok) {
+        clearCart();
         navigate("/order-success");
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         alert(errorData.message || "Failed to place order. Please try again.");
       }
     } catch (err) {
@@ -76,40 +116,88 @@ const CartPage = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="cart-page container py-5">
-        <h2 className="mb-4">Your Cart</h2>
-        {cart.length === 0 ? (
-          <div className="text-center py-5">
-            <p>Your cart is empty.</p>
-            <button className="btn btn-warning" onClick={() => navigate("/menu")}>
-              Go to Menu
-            </button>
-          </div>
-        ) : (
-          <div className="row">
-            <div className="col-md-8">
-              <ul className="list-group mb-4">
-                {cart.map((item, index) => (
-                  <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                    <div className="d-flex align-items-center">
-                      <img src={getImageUrl(item.image)} alt={item.name} style={{ width: "50px", height: "50px", objectFit: "cover", marginRight: "15px" }} />
-                      <div>
-                        <h5 className="mb-0">{item.name}</h5>
-                        <small>Quantity: {item.quantity}</small>
+    <div className="sub_page">
+      <div className="hero_area" style={{ minHeight: "450px" }}>
+        <div className="bg-box">
+          <img src="/image/hero-bg.jpg" alt="bg" />
+        </div>
+        <Navbar />
+      </div>
+      
+      <section className="cart-page-section py-5">
+        <div className="container">
+          <h2 className="cart-title text-center mb-5" data-aos="fade-down" style={{ fontFamily: "'Dancing Script', cursive", fontSize: "3.5rem" }}>
+            Shopping Cart
+          </h2>
+          
+          {cartItems.length === 0 ? (
+            <div className="empty-cart-container" data-aos="fade-up">
+              <div className="empty-cart-icon">
+                <FaShoppingCart />
+              </div>
+              <h3>Your cart is empty</h3>
+              <p>Looks like you haven't added anything to your cart yet.</p>
+              <Link to="/menu" className="go-menu-btn">
+                Browse Our Menu
+              </Link>
+            </div>
+          ) : (
+            <div className="row">
+              <div className="col-lg-8" data-aos="fade-right">
+                <div className="cart-card">
+                  {cartItems.map((item, index) => {
+                    const itemProdId = item.productId?._id || item.productId || item._id;
+                    return (
+                      <div key={itemProdId || index} className="cart-item" style={{ animationDelay: `${index * 0.1}s` }}>
+                        <img 
+                          src={getImageUrl(item.image)} 
+                          alt={item.name} 
+                          className="cart-item-img" 
+                        />
+                        <div className="cart-item-details">
+                          <h5 className="cart-item-name">{item.name}</h5>
+                          <p className="cart-item-price">₹{item.price}</p>
+                        </div>
+                        
+                        <div className="cart-quantity-controls" style={{ opacity: updatingId === itemProdId ? 0.5 : 1 }}>
+                          <button 
+                            className="qty-btn" 
+                            onClick={() => handleUpdateQuantity(item, -1)}
+                            disabled={Number(item.quantity) <= 1 || updatingId === itemProdId}
+                          >
+                            <FaMinus />
+                          </button>
+                          <span className="qty-number">{item.quantity}</span>
+                          <button 
+                            className="qty-btn" 
+                            onClick={() => handleUpdateQuantity(item, 1)}
+                            disabled={updatingId === itemProdId}
+                          >
+                            <FaPlus />
+                          </button>
+                        </div>
+                        
+                        <div className="cart-item-subtotal">
+                          <strong>₹{item.price * item.quantity}</strong>
+                        </div>
+                        
+                        <button 
+                          className="remove-item-btn ms-4" 
+                          onClick={() => handleRemoveFromCart(item)}
+                          disabled={updatingId === itemProdId}
+                          title="Remove Item"
+                        >
+                          <FaTrashAlt />
+                        </button>
                       </div>
-                    </div>
-                    <span>₹{item.price * item.quantity}</span>
-                  </li>
-                ))}
-              </ul>
+                    );
+                  })}
+                </div>
 
-              <div className="card p-3 shadow-sm mb-4">
-                <h4>Delivery Address</h4>
-                <div className="form-group mt-2">
+                <div className="cart-card address-section" data-aos="fade-up" data-aos-delay="200">
+                  <h4>Delivery Address</h4>
                   <textarea
-                    className="form-control"
+                    className="address-textarea"
                     rows="3"
                     placeholder="Enter your full address (Street, City, Pin Code)"
                     value={address}
@@ -117,29 +205,44 @@ const CartPage = () => {
                   ></textarea>
                 </div>
               </div>
-            </div>
-            <div className="col-md-4">
-              <div className="card p-3 shadow-sm">
-                <h4>Summary</h4>
-                <hr />
-                <div className="d-flex justify-content-between mb-2">
-                  <span>Items:</span>
-                  <span>{cart.length}</span>
+
+              <div className="col-lg-4" data-aos="fade-left">
+                <div className="cart-card cart-summary-card">
+                  <h3 className="summary-title">Order Summary</h3>
+                  <div className="summary-row">
+                    <span>Subtotal</span>
+                    <span>₹{calculateTotal()}</span>
+                  </div>
+                  <div className="summary-row">
+                    <span>Delivery Fee</span>
+                    <span>₹0</span>
+                  </div>
+                  <div className="summary-row summary-total">
+                    <span>Total</span>
+                    <span>₹{calculateTotal()}</span>
+                  </div>
+                  
+                  <button 
+                    className="checkout-btn" 
+                    onClick={handlePlaceOrder}
+                  >
+                    Place Order
+                  </button>
+                  
+                  <div className="mt-3 text-center">
+                    <Link to="/menu" style={{ color: "var(--secondary-color)", fontWeight: "600" }}>
+                      Continue Shopping
+                    </Link>
+                  </div>
                 </div>
-                <div className="d-flex justify-content-between">
-                  <span>Total Amount:</span>
-                  <strong>₹{calculateTotal()}</strong>
-                </div>
-                <button className="btn btn-warning btn-block mt-4" onClick={handlePlaceOrder}>
-                  Place Order
-                </button>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </section>
+
       <Footer />
-    </>
+    </div>
   );
 };
 

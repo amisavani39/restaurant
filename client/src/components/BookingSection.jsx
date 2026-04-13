@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const BookingSection = () => {
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -25,7 +26,7 @@ const BookingSection = () => {
         ...formData,
         persons: parseInt(formData.persons)
       };
-      const res = await axios.post("http://localhost:5000/api/bookings/book", dataToSubmit);
+      const res = await axios.post(`${API_URL}/api/bookings/book`, dataToSubmit);
       setMessage(res.data.message || "Table booked successfully!");
       setFormData({ name: "", phone: "", email: "", persons: "", date: "", time: "" });
     } catch (err) {

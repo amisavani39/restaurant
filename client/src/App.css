@@ -114,6 +114,27 @@ ul {
   transform: scale(1.1);
 }
 
+.cart_link {
+  position: relative;
+}
+
+.cart_count {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  border: 2px solid var(--secondary-color);
+}
+
 /* User Sidebar */
 .user_sidebar {
   position: fixed;
@@ -341,7 +362,7 @@ ul {
 
 .offer-card {
   background: var(--secondary-color);
-  color: var(--text-white);
+  color: var(--textwhite);
   display: flex;
   align-items: center;
   padding: 25px;
@@ -1233,5 +1254,6 @@ ul {
     transform: none;
   }
 }
+
 
 

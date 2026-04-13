@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const OffersSection = () => {
   return (
@@ -12,9 +13,9 @@ const OffersSection = () => {
             <div className="offer-detail">
               <h5>Tasty Thursdays</h5>
               <h3>20% <span>off</span></h3>
-              <a href="#" className="btn-yellow">
+              <Link to="/menu" className="btn-yellow">
                 Order Now <i className="fa fa-shopping-cart"></i>
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -25,9 +26,9 @@ const OffersSection = () => {
             <div className="offer-detail">
               <h5>Pizza Days</h5>
               <h3>15% <span>off</span></h3>
-              <a href="#" className="btn-yellow">
+              <Link to="/menu" className="btn-yellow">
                 Order Now <i className="fa fa-shopping-cart"></i>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

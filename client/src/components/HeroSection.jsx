@@ -25,7 +25,7 @@ const HeroSection = () => {
               </p>
               <div className="btn-box">
                 <Link to="/book" className="btn1">Book Table</Link>
-                <a href="#" className="btn2">Order Now</a>
+                <Link to="/menu" className="btn2">Order Now</Link>
               </div>
 
               {/* Slider Dots */}
